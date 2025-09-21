@@ -29,11 +29,13 @@ class UserUpdate(BaseModel):
     role: Optional[str] = None
     company_id: Optional[UUID] = None
 
+
 class UserInternal(BaseSchema):
     email: Optional[EmailStr] = None
     password: Optional[str] = None
     role: Optional[str] = None
     company_id: Optional[UUID] = None
+
 
 class User(UserInternal, BaseSchema):
     # company_id: Optional[UUID] = None

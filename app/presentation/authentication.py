@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, Depends, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.exceptions import HTTPException
@@ -18,6 +17,7 @@ auth = APIRouter(
         "auth",
     ],
 )
+
 
 @auth.post("/registration")
 async def registration_handler(
@@ -39,7 +39,7 @@ async def login_for_access_token(
         return result
     except Exception as _e:
         raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(_e))
-        
+
 
 @auth.post("/logout")
 async def logout(
@@ -48,7 +48,7 @@ async def logout(
 ):
     try:
         result = await UsersService(session).user_logout(current_user)
-        return result 
+        return result
     except Exception as _e:
         raise HTTPException(status_code=400, detail=str(_e))
 

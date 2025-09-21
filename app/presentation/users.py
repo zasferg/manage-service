@@ -34,8 +34,7 @@ async def update_users_info(
 ):
     try:
         updated_user = await UsersService(session).update_current_user(
-            update_data=update_data,
-            current_user=current_user
+            update_data=update_data, current_user=current_user
         )
         return updated_user
 
@@ -49,7 +48,9 @@ async def delete_user(
     session: AsyncSession = Depends(get_session),
 ):
     try:
-        result = await UsersService(session).delete_current_user(current_user=current_user)
+        result = await UsersService(session).delete_current_user(
+            current_user=current_user
+        )
         return result
     except Exception as _e:
         raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(_e))

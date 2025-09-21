@@ -38,6 +38,7 @@ class Settings(BaseSettings):
         else:
             return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
+
 settings = Settings()
 
 print(settings.postgres_db_url())

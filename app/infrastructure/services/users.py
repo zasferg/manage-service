@@ -1,4 +1,3 @@
-
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,7 +16,6 @@ from infrastructure.repositories.tokens import TokenRepository
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from core.auth import verify_password, hash_password
-
 
 
 class UsersService:
@@ -43,28 +41,39 @@ class UsersService:
             await TokenRepository(self.session).create(
                 refresh_token=refresh_token, user_id=user.id
             )
-            return JSONResponse(status_code=HTTP_201_CREATED, content={"message": "Registration successful"})
-        
+            return JSONResponse(
+                status_code=HTTP_201_CREATED,
+                content={"message": "Registration successful"},
+            )
+
         except IntegrityError as _ie:
             raise HTTPException(
                 status_code=HTTP_400_BAD_REQUEST,
                 detail=f"Wrong data type, {_ie}",
             )
-    
+
     async def user_login(self, user_data: UserForLogin):
 
         try:
-            user = await UserRepository(self.session).get_filtered_by_params(email=user_data.email)
+            user = await UserRepository(self.session).get_filtered_by_params(
+                email=user_data.email
+            )
 
             prepared_user_data = UserInternal.model_validate(user[0])
 
-            if not user or not verify_password(user_data.password, prepared_user_data.password):
+            if not user or not verify_password(
+                user_data.password, prepared_user_data.password
+            ):
                 raise HTTPException(
                     status_code=HTTP_401_UNAUTHORIZED,
                     detail="Wrong user",
                 )
-            access_token = create_access_token(data={"user_id": str(prepared_user_data.id)})
-            refresh_token = create_refresh_token(data={"user_id": str(prepared_user_data.id)})
+            access_token = create_access_token(
+                data={"user_id": str(prepared_user_data.id)}
+            )
+            refresh_token = create_refresh_token(
+                data={"user_id": str(prepared_user_data.id)}
+            )
             await TokenRepository(self.session).create(
                 refresh_token=refresh_token, user_id=prepared_user_data.id
             )
@@ -75,22 +84,28 @@ class UsersService:
                 status_code=HTTP_400_BAD_REQUEST,
                 detail=f"Wrong data type, {_ie}",
             )
-    
+
     async def user_logout(self, current_user_data: dict):
         try:
-            user = await UserRepository(self.session).get_by_id(id=current_user_data["user"].id)
-            tokens = await TokenRepository(self.session).get_filtered_by_params(user_id=user.id)
+            user = await UserRepository(self.session).get_by_id(
+                id=current_user_data["user"].id
+            )
+            tokens = await TokenRepository(self.session).get_filtered_by_params(
+                user_id=user.id
+            )
             if not tokens:
                 raise HTTPException(
                     status_code=HTTP_400_BAD_REQUEST, detail="Неверный токен"
                 )
             await TokenRepository(self.session).delete_by_user_id(user_id=user.id)
 
-            check_for_token = await TokenRepository(self.session).get_filtered_by_params(
-                user_id=user.id
-            )
+            check_for_token = await TokenRepository(
+                self.session
+            ).get_filtered_by_params(user_id=user.id)
             if not check_for_token:
-                return JSONResponse(status_code=HTTP_204_NO_CONTENT, content={"detail": "Logout"})
+                return JSONResponse(
+                    status_code=HTTP_204_NO_CONTENT, content={"detail": "Logout"}
+                )
 
         except Exception as _e:
             raise HTTPException(status_code=400, detail=_e)
@@ -109,36 +124,41 @@ class UsersService:
         except Exception as _e:
             raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(_e))
 
-    async def update_current_user(
-            self, 
-            current_user: dict, 
-            update_data: UserUpdate
-    ):
+    async def update_current_user(self, current_user: dict, update_data: UserUpdate):
         try:
             if not update_data:
                 raise HTTPException(
                     status_code=HTTP_400_BAD_REQUEST, detail="wrong data"
                 )
-            cleaned_data = {k: v for k, v in update_data.model_dump().items() if v is not None}
-            user = await UserRepository(self.session).update(id=current_user["user"].id, **cleaned_data)
+            cleaned_data = {
+                k: v for k, v in update_data.model_dump().items() if v is not None
+            }
+            user = await UserRepository(self.session).update(
+                id=current_user["user"].id, **cleaned_data
+            )
             return User.model_validate(user)
 
         except Exception as _e:
             raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(_e))
-    
 
     async def delete_current_user(
-            self,
-            current_user: dict,
+        self,
+        current_user: dict,
     ):
         try:
-            user = await UserRepository(self.session).get_by_id(id=current_user["user"].id)
+            user = await UserRepository(self.session).get_by_id(
+                id=current_user["user"].id
+            )
             if not user:
                 raise HTTPException(
                     status_code=HTTP_404_NOT_FOUND, detail="user not found"
-                )  
-            await TokenRepository(self.session).delete_by_user_id(user_id=current_user["user"].id)
+                )
+            await TokenRepository(self.session).delete_by_user_id(
+                user_id=current_user["user"].id
+            )
             await UserRepository(self.session).delete(id=current_user["user"].id)
-            return JSONResponse(status_code=HTTP_204_NO_CONTENT, content="sucsessfully deleted")
+            return JSONResponse(
+                status_code=HTTP_204_NO_CONTENT, content="sucsessfully deleted"
+            )
         except Exception as _e:
             raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(_e))

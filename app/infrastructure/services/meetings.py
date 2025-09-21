@@ -19,18 +19,17 @@ class MeetingService:
         self, meeting: MeetingCreate, user_ids: list[UUID]
     ) -> Meeting:
         try:
-            new_meeting = await MeetingRepository(self.session).create(**meeting.model_dump())
+            new_meeting = await MeetingRepository(self.session).create(
+                **meeting.model_dump()
+            )
             if new_meeting:
                 meeting, conflicts = await self.add_users_to_meeting(
                     meeting_id=new_meeting.id, user_ids=user_ids
                 )
                 return meeting, conflicts
         except Exception as e:
-                await MeetingRepository(self.session).delete(id=new_meeting.id)
-                raise HTTPException(
-                    status_code=400,
-                    detail=str(e)
-                )
+            await MeetingRepository(self.session).delete(id=new_meeting.id)
+            raise HTTPException(status_code=400, detail=str(e))
 
     async def add_users_to_meeting(self, meeting_id: UUID, user_ids: list[UUID]):
 
@@ -52,7 +51,9 @@ class MeetingService:
                 )
 
             objects = [
-                UserMeetingRelationCreate(user_id=item, meeting_id=meeting_id).model_dump()
+                UserMeetingRelationCreate(
+                    user_id=item, meeting_id=meeting_id
+                ).model_dump()
                 for item in user_ids
             ]
 
