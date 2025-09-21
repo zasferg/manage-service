@@ -1,0 +1,155 @@
+from infrastructure.services.tasks import TaskService
+from infrastructure.repositories.tasks import TaskRepository
+from core.permissions import user_manager_permission
+from infrastructure.authentication.auth import access_token_auth
+from infrastructure.schemas.schemas import *
+from fastapi import APIRouter, HTTPException, status, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+from core.dependencies import AsyncSessionType
+from infrastructure.database.session import get_session
+
+
+tasks = APIRouter(
+    prefix="/tasks",
+    tags=[
+        "Задания",
+    ],
+)
+
+
+@tasks.get("/task")
+async def get_task(
+    task_id: UUID,
+    current_user=Depends(access_token_auth),
+    session: AsyncSession = Depends(get_session),
+) -> TaskGet:
+    try:
+        tasks = await TaskService(session).get_task(
+            task_id=task_id, user_id=current_user["user"].id
+        )
+        return tasks
+    except Exception as _e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(_e))
+
+
+@tasks.post("/task")
+async def create_task(
+    new_task_data: TaskCreate,
+    session: AsyncSession = Depends(get_session),
+    user_permission=Depends(user_manager_permission),
+) -> TaskGet:
+    try:
+        if new_task_data:
+            new_task = await TaskService(session).create_task(new_task_data)
+            if new_task:
+                return new_task
+    except Exception as _e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(_e))
+
+
+@tasks.put("/task")
+async def update_task(
+    task_id: UUID,
+    new_task_data: TaskUpdate,
+    session: AsyncSession = Depends(get_session),
+    user_permission=Depends(user_manager_permission),
+) -> TaskGet:
+    try:
+        if new_task_data:
+            new_task = await TaskService(session).update_task(
+                task_id=task_id, data=new_task_data
+            )
+            if new_task:
+                return new_task
+    except Exception as _e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(_e))
+
+
+@tasks.delete("/task")
+async def delete_task(
+    task_id: UUID,
+    session: AsyncSession = Depends(get_session),
+    user_permission=Depends(user_manager_permission),
+) -> TaskGet:
+    try:
+        result = TaskService(session).delete_task(task_id=task_id)
+        if not result:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(_e))
+        return result
+    except Exception as _e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(_e))
+
+
+@tasks.put("/status")
+async def update_status(
+    task_id: UUID,
+    new_status: str = Field,
+    session: AsyncSession = Depends(get_session),
+    manager_permission=Depends(user_manager_permission),
+) -> TaskGet:
+    try:
+        if not TaskStatuses.check_for_value(new_status):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Неправильный статус"
+            )
+        updated_status_task = await TaskService(session).assign_status(
+            task_id=task_id, new_status=new_status
+        )
+        if not updated_status_task:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Задача не найдена"
+            )
+        return updated_status_task
+    except Exception as _e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(_e))
+
+
+@tasks.post("/assign_to")
+async def assign_task_to(
+    user_id: UUID,
+    task_id: UUID,
+    session: AsyncSession = Depends(get_session),
+    user_permission=Depends(user_manager_permission),
+):
+    try:
+        updated_task = await TaskService(session).assing_to(
+            user_id=user_id, task_id=task_id
+        )
+        return updated_task
+    except Exception as _e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(_e))
+
+
+@tasks.post("/create_comment")
+async def create_comment(
+    comment_data: CommentCreate,
+    session: AsyncSession = Depends(get_session),
+    current_user=Depends(access_token_auth),
+) -> CommentGet:
+    try:
+        comment_data.from_user_id = current_user["user"].id
+        new_comment = await TaskService(session).create_comment(comment_data)
+        if new_comment:
+            return new_comment
+    except Exception as _e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(_e))
+
+
+@tasks.get("/chat_history")
+async def get_chat_history(
+    task_id: UUID,
+    user1: UUID,
+    user2: UUID,
+    session: AsyncSession = Depends(get_session),
+) -> list[CommentGet]:
+    try:
+        chat_history = await TaskService(session).get_chat_history(
+            task_id=task_id, user1=user1, user2=user2
+        )
+        if not chat_history:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="История пуста"
+            )
+        return chat_history
+    except Exception as _e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(_e))
