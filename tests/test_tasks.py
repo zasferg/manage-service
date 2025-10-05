@@ -1,9 +1,9 @@
 import pytest
-from infrastructure.schemas.schemas import *
-from infrastructure.repositories.users import UserRepository
-from infrastructure.repositories.company import CompanyRepository
-from infrastructure.repositories.tasks import TaskRepository
-from infrastructure.services.tasks import TaskService
+from app.infrastructure.schemas.schemas import *
+from app.infrastructure.repositories.users import UserRepository
+from app.infrastructure.repositories.company import CompanyRepository
+from app.infrastructure.repositories.tasks import TaskRepository
+from app.infrastructure.services.tasks import TaskService
 from datetime import datetime, timedelta
 
 

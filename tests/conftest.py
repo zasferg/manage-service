@@ -1,14 +1,14 @@
 from pydantic import BaseModel
 import pytest, pytest_asyncio
-from core.config import settings
+from app.core.config import settings
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-from infrastructure.schemas.schemas import UserCreate, CommentCreate, TaskCreate
-from infrastructure.database.models.models import *
+from app.infrastructure.schemas.schemas import UserCreate, CommentCreate, TaskCreate
+from app.infrastructure.database.models.models import *
 import asyncio
 from datetime import datetime, timedelta
-from infrastructure.repositories.users import UserRepository
-from infrastructure.repositories.company import CompanyRepository
-from main import app
+from app.infrastructure.repositories.users import UserRepository
+from app.infrastructure.repositories.company import CompanyRepository
+from app.main import app
 
 
 @pytest.fixture(scope="function")
@@ -30,10 +30,6 @@ async def create_db_tables():
         await conn.run_sync(Base.metadata.create_all)
 
 
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
 @pytest_asyncio.fixture(scope="function")
 async def test_session(create_db_tables):
     engine = create_async_engine(url=settings.postgres_db_url(), pool_pre_ping=True)
@@ -79,7 +75,3 @@ async def make_user_and_company(
     company_id = companies[0].id
 
     return user_id, company_id
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes

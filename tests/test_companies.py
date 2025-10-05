@@ -1,7 +1,7 @@
 import pytest
-from infrastructure.services.companies import CompanyService
-from infrastructure.repositories.company import CompanyRepository
-from infrastructure.repositories.users import UserRepository
+from app.infrastructure.services.companies import CompanyService
+from app.infrastructure.repositories.company import CompanyRepository
+from app.infrastructure.repositories.users import UserRepository
 
 
 @pytest.mark.asyncio
