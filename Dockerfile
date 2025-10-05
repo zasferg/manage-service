@@ -14,7 +14,7 @@ COPY ./.env /app/.env
 RUN pip install --no-cache-dir -r /app/requirements.txt
 RUN pip install uvicorn
 
-COPY ./app /app/app
+COPY . .
 
 EXPOSE 8000
 

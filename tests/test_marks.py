@@ -1,7 +1,7 @@
 import pytest
-from infrastructure.schemas.schemas import RatingRequest
-from infrastructure.services.tasks import TaskService
-from infrastructure.repositories.tasks import TaskRepository
+from app.infrastructure.schemas.schemas import RatingRequest
+from app.infrastructure.services.tasks import TaskService
+from app.infrastructure.repositories.tasks import TaskRepository
 from uuid import UUID
 from datetime import datetime, timedelta
 
@@ -42,7 +42,7 @@ async def test_get_all_ratings(test_session, make_user_and_company):
             "mark": 4,
         },
         {
-            "id": UUID("7193fb7d-5365-42ad-beaa-b935d77b1b24"),  # Different UUID
+            "id": UUID("7193fb7d-5365-42ad-beaa-b935d77b1b24"),
             "description": "test descr 2",
             "deadline": datetime.now() + timedelta(days=5),
             "company_id": company_id,
@@ -50,7 +50,7 @@ async def test_get_all_ratings(test_session, make_user_and_company):
             "mark": 3,
         },
         {
-            "id": UUID("7193fb7d-5365-42ad-beaa-b935d77b1b25"),  # Different UUID
+            "id": UUID("7193fb7d-5365-42ad-beaa-b935d77b1b25"),
             "description": "test descr 3",
             "deadline": datetime.now() + timedelta(days=15),
             "company_id": company_id,
@@ -87,7 +87,7 @@ async def test_get_avg_rating(test_session, make_user_and_company):
             "mark": 4,
         },
         {
-            "id": UUID("7193fb7d-5365-42ad-beaa-b935d77b1b24"),  # Different UUID
+            "id": UUID("7193fb7d-5365-42ad-beaa-b935d77b1b24"),
             "description": "test descr 2",
             "deadline": datetime.now() + timedelta(days=5),
             "company_id": company_id,
@@ -95,7 +95,7 @@ async def test_get_avg_rating(test_session, make_user_and_company):
             "mark": 3,
         },
         {
-            "id": UUID("7193fb7d-5365-42ad-beaa-b935d77b1b25"),  # Different UUID
+            "id": UUID("7193fb7d-5365-42ad-beaa-b935d77b1b25"),
             "description": "test descr 3",
             "deadline": datetime.now() + timedelta(days=15),
             "company_id": company_id,
