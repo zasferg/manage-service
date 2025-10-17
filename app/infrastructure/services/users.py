@@ -9,13 +9,19 @@ from starlette.status import (
     HTTP_404_NOT_FOUND,
     HTTP_201_CREATED,
 )
-from core.auth import create_access_token, create_refresh_token
-from infrastructure.schemas.schemas import *
-from infrastructure.repositories.users import UserRepository
-from infrastructure.repositories.tokens import TokenRepository
+from app.core.auth import create_access_token, create_refresh_token
+from app.core.auth import verify_password, hash_password
+from app.infrastructure.schemas.users import (
+    UserCreate,
+    UserForLogin,
+    UserInternal,
+    UserUpdate,
+    User,
+)
+from app.infrastructure.repositories.users import UserRepository
+from app.infrastructure.repositories.tokens import TokenRepository
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from core.auth import verify_password, hash_password
 
 
 class UsersService:

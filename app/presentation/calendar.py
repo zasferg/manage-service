@@ -1,11 +1,9 @@
-from infrastructure.repositories.calendar import CalendarRepository
-from infrastructure.services.calendar import CalendarService
-from core.permissions import user_manager_permission
-from infrastructure.authentication.auth import access_token_auth
-from infrastructure.schemas.schemas import *
+from app.infrastructure.repositories.calendar import CalendarRepository
+from app.infrastructure.services.calendar import CalendarService
+from app.infrastructure.authentication.auth import access_token_auth
+from app.infrastructure.database.session import get_session
 from fastapi import APIRouter, HTTPException, status, Depends, Response
 from sqlalchemy.ext.asyncio import AsyncSession
-from infrastructure.database.session import get_session
 
 
 calendar = APIRouter(

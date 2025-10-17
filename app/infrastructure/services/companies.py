@@ -1,9 +1,10 @@
-from infrastructure.repositories.company import CompanyRepository
-from infrastructure.repositories.users import UserRepository
-from infrastructure.schemas.schemas import CompanyCreate, Company, User
+from app.infrastructure.repositories.company import CompanyRepository
+from app.infrastructure.repositories.users import UserRepository
+from app.infrastructure.schemas.companies import CompanyCreate, Company
+from app.infrastructure.schemas.users import User
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.core.enums import RolesEnum
 from uuid import UUID
-from core.enums import RolesEnum
 
 
 class CompanyService:

@@ -1,11 +1,11 @@
-from infrastructure.repositories.tasks import TaskRepository
-from infrastructure.repositories.users import UserRepository
-from infrastructure.repositories.comments import CommentsRepository
-from infrastructure.repositories.calendar import CalendarRepository
-from infrastructure.schemas.schemas import *
+from typing import Optional
+from app.infrastructure.repositories.tasks import TaskRepository
+from app.infrastructure.repositories.users import UserRepository
+from app.infrastructure.repositories.comments import CommentsRepository
+from app.infrastructure.schemas.tasks import TaskCreate, TaskGet
+from app.infrastructure.schemas.comments import CommentCreate, CommentGet, CommentEntity
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
-from core.enums import RolesEnum, TaskStatuses, Events
 from fastapi import status, HTTPException
 
 
@@ -78,45 +78,6 @@ class TaskService:
                 task_id, **cleaned_data
             )
             return TaskGet.model_validate(updated_task)
-
-    async def add_rating(self, task_id: UUID, rating: RatingRequest) -> TaskGet:
-        updated_task = await TaskRepository(self.session).update(
-            id=task_id, mark=rating.rating
-        )
-        if not updated_task:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Не найдено оценок"
-            )
-        return TaskGet.model_validate(updated_task)
-
-    async def get_ratings(self, user_id: UUID) -> list:
-        tasks = await TaskRepository(self.session).get_filtered_by_params(
-            perform_user_id=user_id
-        )
-        if not tasks:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Не найдено оценок"
-            )
-        return [
-            TaskGet.model_validate(task).model_dump(
-                include=["id", "description", "mark"]
-            )
-            for task in tasks
-        ]
-
-    async def get_avg_rating(
-        self, user_id: UUID, from_date: datetime, to_date: datetime
-    ) -> int:
-        tasks = await TaskRepository(self.session).filter_by_period(
-            start_date=from_date, to_date=to_date, perform_user_id=user_id
-        )
-        task_marks = [task.mark for task in tasks]
-
-        import statistics
-
-        avg = statistics.mean(task_marks)
-
-        return float(avg)
 
     async def create_comment(self, comment_data: CommentCreate) -> CommentGet:
         task = await TaskRepository(self.session).get_by_id(comment_data.task_id)

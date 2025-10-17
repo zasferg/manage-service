@@ -1,14 +1,18 @@
+from app.core.auth import (
+    create_access_token,
+    create_refresh_token,
+    get_checked_token_data,
+)
+from app.infrastructure.schemas.users import UserCreate, UserForLogin
+from app.infrastructure.repositories.tokens import TokenRepository
+from app.infrastructure.authentication.auth import access_token_auth
+from app.infrastructure.database.session import get_session
+from app.infrastructure.services.users import UsersService
+from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.exceptions import HTTPException
 from starlette.status import HTTP_400_BAD_REQUEST
-from core.auth import create_access_token, create_refresh_token, get_checked_token_data
-from infrastructure.schemas.schemas import *
-from infrastructure.repositories.tokens import TokenRepository
-from infrastructure.authentication.auth import access_token_auth
-from sqlalchemy.ext.asyncio import AsyncSession
-from infrastructure.database.session import get_session
-from infrastructure.services.users import UsersService
 
 
 auth = APIRouter(

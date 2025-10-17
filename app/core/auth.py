@@ -6,10 +6,10 @@ from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import status
 from datetime import datetime
-from infrastructure.repositories.users import UserRepository
-from infrastructure.repositories.tokens import TokenRepository
+from app.infrastructure.repositories.users import UserRepository
+from app.infrastructure.repositories.tokens import TokenRepository
 import bcrypt
-from core.config import settings
+from app.core.config import settings
 
 
 credentials_exception = HTTPException(

@@ -1,5 +1,5 @@
 from sqladmin import ModelView
-from infrastructure.database.models.models import *
+from app.infrastructure.database.models.models import *
 
 
 class UserAdmin(ModelView, model=User):

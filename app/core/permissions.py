@@ -1,11 +1,11 @@
-from infrastructure.authentication.auth import access_token_auth
-from infrastructure.repositories.users import UserRepository
+from app.infrastructure.authentication.auth import access_token_auth
+from app.infrastructure.repositories.users import UserRepository
+from app.infrastructure.database.session import get_session
+from app.infrastructure.schemas.users import User
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends, HTTPException, status
-from core.enums import RolesEnum
-from infrastructure.database.session import get_session
+from app.core.enums import RolesEnum
 from typing import Annotated
-from infrastructure.schemas.schemas import *
 
 
 permissons_exception = HTTPException(

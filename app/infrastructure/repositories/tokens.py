@@ -1,5 +1,5 @@
-from infrastructure.repositories.base import BaseRepository
-from infrastructure.database.models.models import Token
+from app.infrastructure.repositories.base import BaseRepository
+from app.infrastructure.database.models.models import Token
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 from sqlalchemy import delete

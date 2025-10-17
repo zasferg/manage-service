@@ -1,15 +1,15 @@
 from fastapi import FastAPI
 import uvicorn
-from presentation.authentication import auth
-from presentation.calendar import calendar
-from presentation.companies import companies
-from presentation.marks import marks
-from presentation.meetings import meetings
-from presentation.tasks import tasks
-from presentation.users import users
-from infrastructure.database.session import engine
+from app.presentation.authentication import auth
+from app.presentation.calendar import calendar
+from app.presentation.companies import companies
+from app.presentation.marks import marks
+from app.presentation.meetings import meetings
+from app.presentation.tasks import tasks
+from app.presentation.users import users
+from app.infrastructure.database.session import engine
 from sqladmin import Admin
-from infrastructure.admin.sqladmin import (
+from app.infrastructure.admin.sqladmin import (
     UserAdmin,
     TokenAdmin,
     CompanyAdmin,

@@ -1,5 +1,9 @@
-from infrastructure.schemas.schemas import *
-from infrastructure.repositories.meetings import (
+from app.infrastructure.schemas.meetings import (
+    MeetingCreate,
+    Meeting,
+    UserMeetingRelationCreate,
+)
+from app.infrastructure.repositories.meetings import (
     MeetingRepository,
     UserMeetingRepository,
 )
@@ -8,6 +12,8 @@ from fastapi import HTTPException
 
 from uuid import UUID
 from sqlalchemy import select, and_
+from datetime import datetime
+from typing import List, Optional
 
 
 class MeetingService:

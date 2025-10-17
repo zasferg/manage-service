@@ -1,5 +1,5 @@
-from infrastructure.repositories.base import BaseRepository
-from infrastructure.database.models.models import Task, Meetings
+from app.infrastructure.repositories.base import BaseRepository
+from app.infrastructure.database.models.models import Task, Meetings
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, union_all, extract, literal
 
