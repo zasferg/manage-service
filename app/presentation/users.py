@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends
-from infrastructure.authentication.auth import access_token_auth
 from sqlalchemy.ext.asyncio import AsyncSession
-from infrastructure.schemas.schemas import *
+from app.infrastructure.schemas.users import UserUpdate
+from app.infrastructure.database.session import get_session
+from app.infrastructure.services.users import UsersService
+from app.infrastructure.authentication.auth import access_token_auth
 from starlette.status import HTTP_400_BAD_REQUEST
 from fastapi import HTTPException
-from infrastructure.database.session import get_session
 
-from infrastructure.services.users import UsersService
 
 users = APIRouter(
     prefix="/users",

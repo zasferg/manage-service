@@ -1,5 +1,5 @@
-from infrastructure.repositories.base import BaseRepository
-from infrastructure.database.models.models import Comments
+from app.infrastructure.repositories.base import BaseRepository
+from app.infrastructure.database.models.models import Comments
 from sqlalchemy.ext.asyncio import AsyncSession
 
 

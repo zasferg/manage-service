@@ -1,4 +1,4 @@
-from infrastructure.database.session import get_session
+from app.infrastructure.database.session import get_session
 from sqlalchemy import select, update, delete
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.asyncio import AsyncSession

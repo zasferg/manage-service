@@ -1,11 +1,12 @@
-from infrastructure.services.meetings import MeetingService
-from core.permissions import user_manager_permission
-from infrastructure.authentication.auth import access_token_auth
-from infrastructure.schemas.schemas import *
+from app.infrastructure.services.meetings import MeetingService
+from app.infrastructure.database.session import get_session
+from app.infrastructure.authentication.auth import access_token_auth
+from app.infrastructure.schemas.meetings import Meeting, MeetingCreate
+from app.core.permissions import user_manager_permission
 from fastapi import APIRouter, HTTPException, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from core.dependencies import AsyncSessionType
-from infrastructure.database.session import get_session
+
+from uuid import UUID
 
 
 meetings = APIRouter(

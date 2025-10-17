@@ -12,7 +12,7 @@ from sqlalchemy import (
     Column,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship, DeclarativeBase
-from core.enums import RolesEnum, TaskStatuses
+from app.core.enums import RolesEnum, TaskStatuses
 
 
 class Base(DeclarativeBase):
@@ -90,17 +90,31 @@ class Task(Base):
         String, nullable=False, default=TaskStatuses.OPENED
     )
     deadline: Mapped[datetime] = mapped_column(DateTime, nullable=True)
-    mark: Mapped[int] = mapped_column(Integer, nullable=True)
     company_id: Mapped[UUID] = mapped_column(ForeignKey("companies.id"))
     perform_user_id: Mapped[UUID] = mapped_column(
         ForeignKey("user_accounts.id"), nullable=True
     )
-    comments: Mapped[list["Comments"]] = relationship(back_populates="task")
+    comments: Mapped[list["Comments"]] = relationship(back_populates="tasks")
     company: Mapped["Company"] = relationship(back_populates="tasks")
     user: Mapped["User"] = relationship(back_populates="tasks")
+    mark: Mapped["Evaluation"] = relationship(back_populates="tasks", lazy="selectin")
 
     def __str__(self):
         return f"Задача: {self.description}"
+
+
+class Evaluation(Base):
+    __tablename__ = "evaluations"
+
+    mark: Mapped[int] = mapped_column(Integer, nullable=True)
+    task_id: Mapped[UUID] = mapped_column(ForeignKey("tasks.id"))
+
+    tasks: Mapped["Task"] = relationship(back_populates="mark")
+
+    def __str__(
+        self,
+    ):
+        return f"Оценка задания {self.task_id} - {self.mark}"
 
 
 class Comments(Base):
@@ -111,7 +125,7 @@ class Comments(Base):
     from_user_id: Mapped[UUID] = mapped_column(ForeignKey("user_accounts.id"))
     to_user_id: Mapped[UUID] = mapped_column(ForeignKey("user_accounts.id"))
     task_id: Mapped[int] = mapped_column(ForeignKey("tasks.id"), nullable=False)
-    task: Mapped["Task"] = relationship(back_populates="comments")
+    tasks: Mapped["Task"] = relationship(back_populates="comments")
     from_user: Mapped["User"] = relationship(foreign_keys=[from_user_id])
     to_user: Mapped["User"] = relationship(foreign_keys=[to_user_id])
 

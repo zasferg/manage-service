@@ -1,12 +1,12 @@
+from app.infrastructure.database.session import get_session
+from app.infrastructure.schemas.companies import CompanyCreate, Company
+from app.infrastructure.schemas.users import User
+from app.infrastructure.services.companies import CompanyService
+from app.core.permissions import user_admin_permission
 from fastapi import APIRouter, Depends
-from infrastructure.schemas.schemas import *
-from infrastructure.services.companies import CompanyService
-from core.permissions import user_admin_permission, user_manager_permission
-from infrastructure.authentication.auth import access_token_auth
-from sqlalchemy.ext.asyncio import AsyncSession
-from infrastructure.database.session import get_session
-from typing import Annotated
 from fastapi import HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+from uuid import UUID
 
 companies = APIRouter(
     prefix="/companies",

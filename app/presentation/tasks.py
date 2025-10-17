@@ -1,12 +1,14 @@
-from infrastructure.services.tasks import TaskService
-from infrastructure.repositories.tasks import TaskRepository
-from core.permissions import user_manager_permission
-from infrastructure.authentication.auth import access_token_auth
-from infrastructure.schemas.schemas import *
+from app.infrastructure.services.tasks import TaskService
+from app.core.enums import TaskStatuses
+from app.core.permissions import user_manager_permission
+from app.infrastructure.authentication.auth import access_token_auth
+from app.infrastructure.schemas.comments import CommentCreate, CommentGet
+from app.infrastructure.schemas.tasks import TaskGet, TaskCreate, TaskUpdate
 from fastapi import APIRouter, HTTPException, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from core.dependencies import AsyncSessionType
-from infrastructure.database.session import get_session
+from app.infrastructure.database.session import get_session
+from uuid import UUID
+from pydantic import Field
 
 
 tasks = APIRouter(
@@ -30,6 +32,8 @@ async def get_task(
         return tasks
     except Exception as _e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(_e))
+    except ValueError as _ve:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(_ve))
 
 
 @tasks.post("/task")

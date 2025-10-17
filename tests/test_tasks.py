@@ -1,10 +1,11 @@
 import pytest
-from app.infrastructure.schemas.schemas import *
+from app.infrastructure.schemas.tasks import TaskCreate, TaskUpdate
 from app.infrastructure.repositories.users import UserRepository
 from app.infrastructure.repositories.company import CompanyRepository
 from app.infrastructure.repositories.tasks import TaskRepository
 from app.infrastructure.services.tasks import TaskService
 from datetime import datetime, timedelta
+from uuid import UUID
 
 
 @pytest.mark.asyncio
@@ -224,7 +225,7 @@ async def test_update_status(
 
     await TaskRepository(test_session).create(**task_dict)
 
-    from core.enums import TaskStatuses
+    from app.core.enums import TaskStatuses
 
     status = TaskStatuses.IN_PROGRESS
 

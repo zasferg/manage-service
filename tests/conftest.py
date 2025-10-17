@@ -1,14 +1,11 @@
-from pydantic import BaseModel
+import asyncio
+from app.infrastructure.schemas.users import UserCreate
+from app.infrastructure.database.models.models import *
+from app.infrastructure.repositories.users import UserRepository
+from app.infrastructure.repositories.company import CompanyRepository
 import pytest, pytest_asyncio
 from app.core.config import settings
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-from app.infrastructure.schemas.schemas import UserCreate, CommentCreate, TaskCreate
-from app.infrastructure.database.models.models import *
-import asyncio
-from datetime import datetime, timedelta
-from app.infrastructure.repositories.users import UserRepository
-from app.infrastructure.repositories.company import CompanyRepository
-from app.main import app
 
 
 @pytest.fixture(scope="function")

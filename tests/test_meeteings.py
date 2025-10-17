@@ -1,5 +1,5 @@
 from app.infrastructure.services.meetings import MeetingService
-from app.infrastructure.schemas.schemas import MeetingCreate, MeetingWithRelations, User
+from app.infrastructure.schemas.meetings import MeetingCreate, User
 from app.infrastructure.repositories.meetings import UserMeetingRepository
 from app.infrastructure.repositories.users import UserRepository
 from datetime import datetime, timedelta
