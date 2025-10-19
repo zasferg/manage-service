@@ -46,7 +46,12 @@ class User(Base):
     )
 
     company: Mapped["Company"] = relationship(back_populates="users", lazy="selectin")
-    tasks: Mapped[list["Task"]] = relationship(back_populates="user")
+    performed_tasks: Mapped[list["Task"]] = relationship(
+        back_populates="perform_user", foreign_keys="[Task.perform_user_id]"
+    )
+    authored_tasks: Mapped[list["Task"]] = relationship(
+        back_populates="author", foreign_keys="[Task.author_id]"
+    )
     meetings: Mapped[list["Meetings"]] = relationship(
         secondary="user_meeting_relations", back_populates="user"
     )
@@ -94,9 +99,18 @@ class Task(Base):
     perform_user_id: Mapped[UUID] = mapped_column(
         ForeignKey("user_accounts.id"), nullable=True
     )
+    author_id: Mapped[UUID] = mapped_column(
+        ForeignKey("user_accounts.id"), nullable=False
+    )
+
     comments: Mapped[list["Comments"]] = relationship(back_populates="tasks")
     company: Mapped["Company"] = relationship(back_populates="tasks")
-    user: Mapped["User"] = relationship(back_populates="tasks")
+    perform_user: Mapped["User"] = relationship(
+        back_populates="performed_tasks", foreign_keys=[perform_user_id]
+    )
+    author: Mapped["User"] = relationship(
+        back_populates="authored_tasks", foreign_keys=[author_id]
+    )
     mark: Mapped["Evaluation"] = relationship(back_populates="tasks", lazy="selectin")
 
     def __str__(self):
