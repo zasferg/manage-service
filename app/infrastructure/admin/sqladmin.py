@@ -3,7 +3,14 @@ from app.infrastructure.database.models.models import *
 
 
 class UserAdmin(ModelView, model=User):
-    column_list = [User.email, User.role, User.company, User.tasks, User.meetings]
+    column_list = [
+        User.email,
+        User.role,
+        User.company,
+        User.performed_tasks,
+        User.authored_tasks,
+        User.meetings,
+    ]
 
 
 class TokenAdmin(ModelView, model=Token):
@@ -20,7 +27,8 @@ class TaskAdmin(ModelView, model=Task):
         Task.status,
         Task.deadline,
         Task.mark,
-        Task.user,
+        Task.perform_user,
+        Task.author,
         Task.company,
         Task.comments,
     ]

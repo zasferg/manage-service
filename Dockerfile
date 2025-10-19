@@ -18,7 +18,8 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "python -m uvicorn app.main:app --host 0.0.0.0"]
+CMD ["sh", "-c", "alembic upgrade heads && python -m uvicorn app.main:app --host 0.0.0.0"]
+
 
 
 

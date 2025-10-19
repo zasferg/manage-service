@@ -123,7 +123,7 @@ class UsersService:
             )
             if not user_response:
                 raise HTTPException(
-                    status_code=HTTP_400_BAD_REQUEST, detail="usr not found"
+                    status_code=HTTP_400_BAD_REQUEST, detail="Пользователь не найден"
                 )
             user = User.model_validate(user_response)
             return user
@@ -134,7 +134,7 @@ class UsersService:
         try:
             if not update_data:
                 raise HTTPException(
-                    status_code=HTTP_400_BAD_REQUEST, detail="wrong data"
+                    status_code=HTTP_400_BAD_REQUEST, detail="Ошибка данных"
                 )
             cleaned_data = {
                 k: v for k, v in update_data.model_dump().items() if v is not None
@@ -157,14 +157,14 @@ class UsersService:
             )
             if not user:
                 raise HTTPException(
-                    status_code=HTTP_404_NOT_FOUND, detail="user not found"
+                    status_code=HTTP_404_NOT_FOUND, detail="Пользователь не найден"
                 )
             await TokenRepository(self.session).delete_by_user_id(
                 user_id=current_user["user"].id
             )
             await UserRepository(self.session).delete(id=current_user["user"].id)
             return JSONResponse(
-                status_code=HTTP_204_NO_CONTENT, content="sucsessfully deleted"
+                status_code=HTTP_204_NO_CONTENT, content="Успешно удален"
             )
         except Exception as _e:
             raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(_e))
