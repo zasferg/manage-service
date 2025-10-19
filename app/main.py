@@ -9,6 +9,7 @@ from app.presentation.tasks import tasks
 from app.presentation.users import users
 from app.infrastructure.database.session import engine
 from sqladmin import Admin
+from app.infrastructure.admin.auth import DBAuth
 from app.infrastructure.admin.sqladmin import (
     UserAdmin,
     TokenAdmin,
@@ -16,6 +17,7 @@ from app.infrastructure.admin.sqladmin import (
     TaskAdmin,
     MeetingsAdmin,
 )
+from app.core.config import settings
 
 app = FastAPI()
 
@@ -27,7 +29,11 @@ app.include_router(marks)
 app.include_router(meetings)
 app.include_router(calendar)
 
-admin = Admin(app, engine)
+admin = Admin(
+    app=app,
+    engine=engine,
+    authentication_backend=DBAuth(secret_key=settings.SECRET_KEY_FOR_ADMIN),
+)
 
 admin.add_view(UserAdmin)
 admin.add_view(TokenAdmin)

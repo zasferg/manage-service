@@ -1,4 +1,4 @@
-from app.infrastructure.repositories.evaluations import EvalustionsRepository
+from app.infrastructure.repositories.evaluations import EvaluationsRepository
 from app.infrastructure.repositories.tasks import TaskRepository
 from app.infrastructure.schemas.evaluations import EvaluationCreate, EvaluationGet
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,14 +17,14 @@ class EvaluationService:
         task = await TaskRepository(self.session).get_by_id(id=payload.task_id)
         if not task:
             raise ValueError(f"ЗАдание с id {payload.task_id} не найдено")
-        evaluation_check = await EvalustionsRepository(
+        evaluation_check = await EvaluationsRepository(
             self.session
         ).get_filtered_by_params(task_id=task.id)
         if evaluation_check:
             raise ValueError(
                 f"Задание с id {payload.task_id} уже имеет оценку{evaluation_check[0].mark}"
             )
-        new_evaluation = await EvalustionsRepository(self.session).create(
+        new_evaluation = await EvaluationsRepository(self.session).create(
             task_id=payload.task_id, mark=payload.mark
         )
         if new_evaluation:
@@ -38,7 +38,7 @@ class EvaluationService:
         if not tasks:
             raise ValueError(f"Заданий не найдено")
         task_ids = [task.id for task in tasks]
-        evaluations = await EvalustionsRepository(self.session).get_bulk_evaluations(
+        evaluations = await EvaluationsRepository(self.session).get_bulk_evaluations(
             task_ids=task_ids
         )
         if not evaluations:
@@ -55,7 +55,7 @@ class EvaluationService:
         if not tasks:
             raise ValueError(f"Заданий не найдено")
         task_ids = [task.id for task in tasks]
-        evaluations = await EvalustionsRepository(self.session).get_bulk_evaluations(
+        evaluations = await EvaluationsRepository(self.session).get_bulk_evaluations(
             task_ids=task_ids
         )
         if not evaluations:

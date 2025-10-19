@@ -11,6 +11,7 @@ from starlette.status import (
 )
 from app.core.auth import create_access_token, create_refresh_token
 from app.core.auth import verify_password, hash_password
+from app.core.enums import RolesEnum
 from app.infrastructure.schemas.users import (
     UserCreate,
     UserForLogin,
@@ -136,6 +137,8 @@ class UsersService:
                 raise HTTPException(
                     status_code=HTTP_400_BAD_REQUEST, detail="Ошибка данных"
                 )
+            if update_data.role and current_user["role"] != RolesEnum.ADMIN:
+                raise ValueError("Вы не можете обновлять роль")
             cleaned_data = {
                 k: v for k, v in update_data.model_dump().items() if v is not None
             }

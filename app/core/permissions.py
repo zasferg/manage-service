@@ -5,7 +5,6 @@ from app.infrastructure.schemas.users import User
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends, HTTPException, status
 from app.core.enums import RolesEnum
-from typing import Annotated
 
 
 permissons_exception = HTTPException(
@@ -20,10 +19,10 @@ async def user_manager_permission(
 ) -> User:
     user = UserRepository(session).get_by_id(id=current_user["user"].id)
 
-    if not user.role == RolesEnum.MANAGER:
+    if user.role == RolesEnum.MANAGER or user.role == RolesEnum.ADMIN:
+        return user
+    else:
         raise permissons_exception
-
-    return user
 
 
 async def user_admin_permission(

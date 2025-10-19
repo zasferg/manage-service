@@ -37,11 +37,12 @@ class CompanyService:
     async def delete_user_from_company(self, user_id: UUID, company_id: UUID):
         users = await self.get_company_users(company_id=company_id)
         for user in users:
-            await UserRepository(self.session).update(id=user.id, company_id=None)
-            updated_company = await CompanyRepository(self.session).get_by_id(
-                id=company_id
-            )
-            return Company.model_validate(updated_company)
+            if user.id == user_id:
+                await UserRepository(self.session).update(id=user.id, company_id=None)
+                updated_company = await CompanyRepository(self.session).get_by_id(
+                    id=company_id
+                )
+                return Company.model_validate(updated_company)
 
     async def get_company_users(
         self,
@@ -51,9 +52,10 @@ class CompanyService:
         users_for_company = await UserRepository(self.session).get_filtered_by_params(
             company_id=company_id,
         )
-        return [User.model_validate(obj) for obj in users_for_company]
+        if users_for_company:
+            return [User.model_validate(obj) for obj in users_for_company]
 
-    async def assign_comppany_role(
+    async def assign_company_role(
         self, company_id: UUID, user_id: UUID, user_role: RolesEnum
     ) -> User:
         company_user_ids = await self.get_company_users(company=company_id)

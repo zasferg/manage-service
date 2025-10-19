@@ -32,6 +32,8 @@ class Settings(BaseSettings):
     JWT_REFRESH_TOKEN_EXPIRE_MINUTES: int
     VERIFICATION_CODE_EXPIRE_SECONDS: int
 
+    SECRET_KEY_FOR_ADMIN: str
+
     def postgres_db_url(self) -> str:
         if self.DEBUG:
             return f"postgresql+asyncpg://{self.TEST_DB_USER}:{self.TEST_DB_PASSWORD}@{self.TEST_DB_HOST}:{self.TEST_DB_PORT}/{self.TEST_DB_NAME}"

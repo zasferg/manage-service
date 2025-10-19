@@ -1,6 +1,6 @@
 import pytest
 from app.infrastructure.services.evaluations import EvaluationService
-from app.infrastructure.repositories.evaluations import EvalustionsRepository
+from app.infrastructure.repositories.evaluations import EvaluationsRepository
 from app.infrastructure.repositories.tasks import TaskRepository
 from uuid import UUID
 from datetime import datetime, timedelta
@@ -77,7 +77,7 @@ async def test_get_all_ratings(test_session, make_user_and_company):
         await TaskRepository(test_session).create(**task)
 
     for mark in marks_list:
-        await EvalustionsRepository(test_session).create(**mark)
+        await EvaluationsRepository(test_session).create(**mark)
 
     result = await EvaluationService(test_session).get_ratings(user_id=user_id)
 
@@ -139,7 +139,7 @@ async def test_get_avg_rating(test_session, make_user_and_company):
         await TaskRepository(test_session).create(**task)
 
     for mark in marks_list:
-        await EvalustionsRepository(test_session).create(**mark)
+        await EvaluationsRepository(test_session).create(**mark)
 
     result = await EvaluationService(test_session).get_avg_rating(
         user_id=user_id,

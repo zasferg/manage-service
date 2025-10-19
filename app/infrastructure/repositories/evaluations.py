@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 
-class EvalustionsRepository(BaseRepository):
+class EvaluationsRepository(BaseRepository):
 
     def __init__(self, async_session: AsyncSession):
         super().__init__(Evaluation, async_session)

@@ -10,7 +10,6 @@ from uuid import UUID
 from fastapi import status, HTTPException
 
 
-
 class TaskService:
 
     def __init__(self, session: AsyncSession):
@@ -22,7 +21,7 @@ class TaskService:
             deadline=task.deadline,
             company_id=task.company_id,
             perform_user_id=task.perform_user_id,
-            author_id = manager_id,
+            author_id=manager_id,
         )
         return TaskGet.model_validate(new_task)
 
@@ -55,7 +54,9 @@ class TaskService:
             return response
         return None
 
-    async def assing_to(self, task_id: UUID, user_id: UUID, manager_id: UUID) -> TaskGet:
+    async def assing_to(
+        self, task_id: UUID, user_id: UUID, manager_id: UUID
+    ) -> TaskGet:
         user_to_assign = await UserRepository(self.session).get_by_id(id=user_id)
         if not user_to_assign:
             raise HTTPException(
@@ -74,7 +75,9 @@ class TaskService:
         )
         return TaskGet.model_validate(updated_task)
 
-    async def update_task(self, task_id: UUID, data: TaskCreate, manager_id: UUID) -> TaskGet:
+    async def update_task(
+        self, task_id: UUID, data: TaskCreate, manager_id: UUID
+    ) -> TaskGet:
         cleaned_data = {k: v for k, v in data.model_dump().items() if v is not None}
 
         if cleaned_data and self._check_for_author(manager_id, task_id):

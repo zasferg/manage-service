@@ -13,10 +13,11 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     password: str = Field(..., min_length=8, max_length=128)
 
-    @field_validator('password')
+    @field_validator("password")
     @classmethod
     def validate_password_strength(cls, value: str) -> str:
         return PasswordValidator.validate_and_raise(value)
+
 
 class UserUpdate(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
@@ -25,7 +26,7 @@ class UserUpdate(BaseModel):
     role: Optional[str] = None
     company_id: Optional[UUID] = None
 
-    @field_validator('password')
+    @field_validator("password")
     @classmethod
     def validate_password_strength(cls, value: str) -> str:
         return PasswordValidator.validate_and_raise(value)
@@ -39,8 +40,6 @@ class UserInternal(BaseSchema):
 
 
 class User(UserInternal, BaseSchema):
-    # company_id: Optional[UUID] = None
-    # company: Optional["Company"] = None
     pass
 
 

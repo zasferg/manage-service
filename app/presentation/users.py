@@ -4,7 +4,7 @@ from app.infrastructure.schemas.users import UserUpdate
 from app.infrastructure.database.session import get_session
 from app.infrastructure.services.users import UsersService
 from app.infrastructure.authentication.auth import access_token_auth
-from starlette.status import HTTP_400_BAD_REQUEST
+from starlette.status import HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN
 from fastapi import HTTPException
 
 
@@ -36,10 +36,13 @@ async def update_users_info(
         updated_user = await UsersService(session).update_current_user(
             update_data=update_data, current_user=current_user
         )
-        return updated_user
+        if updated_user:
+            return updated_user
 
     except Exception as _e:
         raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(_e))
+    except ValueError as _ve:
+        raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail=str(_e))
 
 
 @users.delete("/me")
@@ -51,6 +54,7 @@ async def delete_user(
         result = await UsersService(session).delete_current_user(
             current_user=current_user
         )
-        return result
+        if result:
+            return result
     except Exception as _e:
         raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail=str(_e))
