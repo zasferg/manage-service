@@ -42,7 +42,10 @@ async def create_task(
 ) -> TaskGet:
     try:
         if not manager_permission.company_id == new_task_data.company_id:
-            raise ValueError("Данный менеджер не привязан к этой компании")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Данный менеджер не привязан к этой компании",
+            )
         if new_task_data:
             new_task = await TaskService(session).create_task(
                 task=new_task_data, manager_id=manager_permission.id
@@ -51,8 +54,6 @@ async def create_task(
                 return new_task
     except Exception as _e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(_e))
-    except ValueError as _ve:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(_ve))
 
 
 @tasks.put("/task")
@@ -64,7 +65,10 @@ async def update_task(
 ) -> TaskGet:
     try:
         if not manager_permission.company_id == new_task_data.company_id:
-            raise ValueError("Данный менеджер не привязан к этой компании")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Данный менеджер не привязан к этой компании",
+            )
         if new_task_data:
             new_task = await TaskService(session).update_task(
                 task_id=task_id, manager_id=manager_permission.id, data=new_task_data
@@ -73,8 +77,6 @@ async def update_task(
                 return new_task
     except Exception as _e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(_e))
-    except ValueError as _ve:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(_ve))
 
 
 @tasks.delete("/task")
@@ -86,12 +88,17 @@ async def delete_task(
     try:
         task = TaskService(session).get_task(task_id=task_id)
         if not manager_permission.company_id == task.company_id:
-            raise ValueError("Данный менеджер не привязан к этой компании")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Данный менеджер не привязан к этой компании",
+            )
         result = TaskService(session).delete_task(
             task_id=task_id, manager_id=manager_permission.id
         )
         if not result:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(_e))
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Задания не найдено"
+            )
         return result
     except Exception as _e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(_e))
@@ -109,7 +116,10 @@ async def update_status(
     try:
         task = TaskService(session).get_task(task_id=task_id)
         if not current_user.company_id == task.company_id:
-            raise ValueError("Данный пользователь не имеет такого задания")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Данный пользователь не имеет такого задания",
+            )
         if not TaskStatuses.check_for_value(new_status):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Неправильный статус"
@@ -124,8 +134,6 @@ async def update_status(
         return updated_status_task
     except Exception as _e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(_e))
-    except ValueError as _ve:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(_ve))
 
 
 @tasks.post("/assign_to")

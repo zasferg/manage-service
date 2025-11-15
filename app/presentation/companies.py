@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
+from starlette.status import HTTP_404_NOT_FOUND
 
 
 companies = APIRouter(
@@ -28,8 +29,8 @@ async def create_company(
     try:
         company = await CompanyService(session).create_company(company_data)
         return company
-    except Exception as e:
-        raise (str(e))
+    except Exception as _e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(_e))
 
 
 @companies.get(
@@ -63,6 +64,10 @@ async def add_user_to_company(
         company_response = await CompanyService(session).add_user_to_company(
             user_id=user_id, company_id=company_id
         )
+        if not company_response:
+            raise HTTPException(
+                status_code=HTTP_404_NOT_FOUND, detail="Компания не найдена."
+            )
         company = Company.model_validate(company_response)
         return company
     except Exception as _e:
@@ -80,7 +85,10 @@ async def delete_user_to_company(
 ):
     try:
         if not manager_permission.company_id == company_id:
-            raise ValueError("Данный менеджер не привязан к этой компании")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Данный пользователь не является менеджером этой компаний",
+            )
         company_response = await CompanyService(session).delete_user_from_company(
             user_id=user_id, company_id=company_id
         )
@@ -88,5 +96,3 @@ async def delete_user_to_company(
         return company
     except Exception as _e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(_e))
-    except ValueError as _ve:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(_ve))

@@ -5,6 +5,7 @@ from starlette.exceptions import HTTPException
 from starlette.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_401_UNAUTHORIZED,
+    HTTP_403_FORBIDDEN,
     HTTP_204_NO_CONTENT,
     HTTP_404_NOT_FOUND,
     HTTP_201_CREATED,
@@ -124,7 +125,7 @@ class UsersService:
             )
             if not user_response:
                 raise HTTPException(
-                    status_code=HTTP_400_BAD_REQUEST, detail="Пользователь не найден"
+                    status_code=HTTP_404_NOT_FOUND, detail="Пользователь не найден"
                 )
             user = User.model_validate(user_response)
             return user
@@ -138,13 +139,19 @@ class UsersService:
                     status_code=HTTP_400_BAD_REQUEST, detail="Ошибка данных"
                 )
             if update_data.role and current_user["role"] != RolesEnum.ADMIN:
-                raise ValueError("Вы не можете обновлять роль")
+                raise HTTPException(
+                    status_code=HTTP_403_FORBIDDEN, detail="Вы не можете обновлять роль"
+                )
             cleaned_data = {
                 k: v for k, v in update_data.model_dump().items() if v is not None
             }
             user = await UserRepository(self.session).update(
                 id=current_user["user"].id, **cleaned_data
             )
+            if not user:
+                raise HTTPException(
+                    status_code=HTTP_404_NOT_FOUND, detail="Пользователь не найден"
+                )
             return User.model_validate(user)
 
         except Exception as _e:

@@ -27,9 +27,6 @@ async def get_marks_for_user(
         )
         if ratings:
             return ratings
-
-    except ValueError as _ve:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(_ve))
     except Exception as _e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(_e))
 
@@ -49,17 +46,12 @@ async def get_avg_marks_for_user(
         )
         if avg_rating:
             response = {"avg_rating": avg_rating}
-
             return response
-
-    except ValueError as _ve:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(_ve))
-
     except Exception as _e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(_e))
 
 
-@marks.put("/add_rating")
+@marks.post("/add_rating")
 async def add_rating(
     payload: EvaluationCreate,
     session: AsyncSession = Depends(get_session),
@@ -69,9 +61,5 @@ async def add_rating(
         task = await EvaluationService(session).add_rating(payload=payload)
         if task:
             return task
-
-    except ValueError as _ve:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(_ve))
-
     except Exception as _e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(_e))

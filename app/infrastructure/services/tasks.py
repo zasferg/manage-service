@@ -27,22 +27,15 @@ class TaskService:
 
     async def get_task(self, task_id: UUID, user_id: UUID) -> TaskGet:
         tasks = await TaskRepository(self.session).get_filtered_by_params(
-            perform_user_id=user_id
+            id=task_id, perform_user_id=user_id
         )
-
-        task_prepared = [TaskGet.model_validate(obj).id for obj in tasks]
         if not tasks:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Нет задач для этого пользователя",
             )
-        if not task_id in task_prepared:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Данной задачи нет у пользователя",
-            )
-        task = await TaskRepository(self.session).get_by_id(id=task_id)
-        return TaskGet.model_validate(task)
+        task_obj = tasks[0]
+        return TaskGet.model_validate(task_obj)
 
     async def delete_task(self, task_id: UUID):
         result = await TaskRepository(self.session).delete(id=task_id)
@@ -73,6 +66,10 @@ class TaskService:
         updated_task = await TaskRepository(self.session).update(
             id=task_id, status=new_status
         )
+        if not updated_task:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Задача не найдена"
+            )
         return TaskGet.model_validate(updated_task)
 
     async def update_task(
@@ -89,17 +86,26 @@ class TaskService:
     async def create_comment(self, comment_data: CommentCreate) -> CommentGet:
         task = await TaskRepository(self.session).get_by_id(comment_data.task_id)
         if not task:
-            raise ValueError(f"Задача с ID {comment_data.task_id} не найдена")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Задача с ID {comment_data.task_id} не найдена",
+            )
         from_user_obj = await UserRepository(self.session).get_by_id(
             id=comment_data.from_user_id
         )
         if not from_user_obj:
-            raise ValueError(f"Пользователь с ID {comment_data.from_user_id} не найден")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Пользователь с ID {comment_data.from_user_id} не найден",
+            )
         to_user_obj = await UserRepository(self.session).get_by_id(
             comment_data.to_user_id
         )
         if not to_user_obj:
-            raise ValueError(f"Пользователь с ID {comment_data.to_user_id} не найден")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Пользователь с ID {comment_data.from_user_id} не найден",
+            )
         last_comment = await self._get_last_comment_in_chat(comment_data.task_id)
 
         prepared_comment_data = CommentEntity(
@@ -120,14 +126,19 @@ class TaskService:
             return CommentGet.model_validate(comment)
         except Exception as e:
             await self.session.rollback()
-            raise Exception(f"Ошибка при создании комментария: {str(e)}")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Ошибка при создании комментария: {str(e)}",
+            )
 
     async def _get_last_comment_in_chat(self, task_id: UUID) -> Optional[CommentEntity]:
         all_comments = await CommentsRepository(self.session).get_filtered_by_params(
             task_id=task_id
         )
         if not all_comments:
-            return None
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Коментарии не найдены"
+            )
         all_comments_prepared = [
             CommentGet.model_validate(comment) for comment in all_comments
         ]
@@ -142,6 +153,10 @@ class TaskService:
         all_comments = await CommentsRepository(self.session).get_filtered_by_params(
             task_id=task_id
         )
+        if not all_comments:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Коментарии не найдены"
+            )
         chat_comments = [
             comment
             for comment in all_comments

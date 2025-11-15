@@ -26,10 +26,6 @@ async def get_meetings(
         meetings = await MeetingService(session).get_meetings_for_user(
             user_id=current_user["user"].id
         )
-        if not meetings:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Не найдено встреч"
-            )
         return meetings
     except Exception as _e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(_e))
