@@ -76,7 +76,7 @@ async def test_get_task(
 
     await TaskRepository(test_session).create(**task_dict)
 
-    task_response = await TaskService(test_session).get_task(
+    task_response = await TaskService(test_session).get_tasks_for_user(
         task_id=task_dict["id"], user_id=user_id
     )
 

@@ -17,7 +17,7 @@ async def user_manager_permission(
     current_user=Depends(access_token_auth),
     session: AsyncSession = Depends(get_session),
 ) -> User:
-    user = UserRepository(session).get_by_id(id=current_user["user"].id)
+    user = await UserRepository(session).get_by_id(id=current_user["user"].id)
 
     if user.role == RolesEnum.MANAGER or user.role == RolesEnum.ADMIN:
         return user

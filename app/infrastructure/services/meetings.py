@@ -32,7 +32,7 @@ class MeetingService:
             )
             if new_meeting:
                 meeting, conflicts = await self.add_users_to_meeting(
-                    meeting=new_meeting.id, user_ids=user_ids
+                    meeting=new_meeting, user_ids=user_ids
                 )
                 return meeting, conflicts
         except Exception as e:
@@ -78,12 +78,12 @@ class MeetingService:
         return [Meeting.model_validate(meeting) for meeting in meetings]
 
     async def cancel_meeting(self, meeting_id: UUID):
-
+        meeting = await MeetingRepository(self.session).get_by_id(id=meeting_id)
+        if not meeting:
+            raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Нет встреч")
         updated_meeting = await MeetingRepository(self.session).update(
             id=meeting_id, is_cancelled=True
         )
-        if not updated_meeting:
-            raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Нет встреч")
         return updated_meeting
 
     async def _check_user_meeting_conflicts(
@@ -94,7 +94,7 @@ class MeetingService:
         exclude_meeting_id: Optional[UUID] = None,
     ) -> dict:
 
-        from infrastructure.database.models.models import (
+        from app.infrastructure.database.models.models import (
             UserMeetingRelation,
             Meetings,
         )

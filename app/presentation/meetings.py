@@ -1,7 +1,7 @@
 from app.infrastructure.services.meetings import MeetingService
 from app.infrastructure.database.session import get_session
 from app.infrastructure.authentication.auth import access_token_auth
-from app.infrastructure.schemas.meetings import Meeting, MeetingCreate
+from app.infrastructure.schemas.meetings import Meeting, MeetingCreate, MeetingCreateRequest
 from app.core.permissions import user_manager_permission
 from fastapi import APIRouter, HTTPException, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -33,14 +33,13 @@ async def get_meetings(
 
 @meetings.post("")
 async def create_meeting(
-    user_ids: list[UUID],
-    meeting_data: MeetingCreate,
+    meeting_data: MeetingCreateRequest,
     session: AsyncSession = Depends(get_session),
     manager_permission=Depends(user_manager_permission),
 ):
     try:
         new_meeting, conflicts = await MeetingService(session).create_meeting(
-            user_ids=user_ids, meeting=meeting_data
+            user_ids=meeting_data.user_ids, meeting=meeting_data.meeting_data
         )
         if new_meeting:
             response = {

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FastAPI Frontend</title>
+<link rel="icon" href="/static/favicon.ico">
+<style>
+  :root{--bg:#f6f7fb;--card:#fff;--accent:#3466ff;--ok:#2eac6d;--err:#ff5959}
+  body{font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;background:var(--bg);margin:0;padding:24px;color:#0b1220}
+  header{max-width:1100px;margin:0 auto 18px}
+  h1{margin:0 0 6px;font-size:20px}
+  section.card{background:var(--card);border-radius:12px;padding:14px 16px;margin-bottom:14px;box-shadow:0 6px 20px rgba(15,23,42,0.06)}
+  label{display:block;font-size:13px;color:#334155;margin-bottom:6px}
+  input,textarea,select{width:100%;padding:10px;border-radius:8px;border:1px solid #e6e9ef;font-size:14px}
+  textarea{min-height:64px}
+  .actions{margin-top:10px}
+  button{background:var(--accent);color:white;padding:10px 12px;border-radius:8px;border:none;cursor:pointer;margin-top:4px}
+  .response{background:#f1f5f9;padding:10px;border-radius:8px;margin-top:10px;font-family:monospace;white-space:pre-wrap;font-size:13px;min-height:36px}
+  .ok{color:var(--ok)}
+  .err{color:var(--err)}
+</style>
+</head>
+<body>
+<header>
+  <h1>FastAPI Frontend — тест всех эндпоинтов</h1>
+</header>
+<main>
+
+<!-- Auth -->
+<section class="card" id="auth">
+  <h2>Auth</h2>
+  <label>Registration — UserCreate</label>
+  <input id="reg_email" placeholder="email">
+  <input id="reg_pass" placeholder="password">
+  <div class="actions"><button onclick="registration()">Регистрация</button></div>
+  <div class="response" id="resp_registration"></div>
+
+  <label>Login — get token</label>
+  <input id="login_email" placeholder="email">
+  <input id="login_pass" placeholder="password">
+  <div class="actions">
+    <button onclick="login()">Login</button>
+    <button onclick="logout()">Logout</button>
+  </div>
+  <div class="response" id="resp_login"></div>
+</section>
+
+<!-- Users -->
+<section class="card" id="users">
+  <h2>Users</h2>
+  <label>GET /users/me</label>
+  <div class="actions"><button onclick="getMe()">GET</button></div>
+  <div class="response" id="resp_me"></div>
+
+  <label>PUT /users/me — UserUpdate</label>
+  <input id="u_email" placeholder="email (optional)">
+  <input id="u_pass" placeholder="password (optional)">
+  <input id="u_company" placeholder="company_id (uuid, optional)">
+  <div class="actions"><button onclick="updateMe()">Update</button></div>
+  <div class="response" id="resp_update_me"></div>
+</section>
+
+<!-- Companies -->
+<section class="card" id="companies">
+  <h2>Companies</h2>
+  <label>POST /companies/create</label>
+  <input id="c_name" placeholder="name (optional)">
+  <div class="actions"><button onclick="createCompany()">Create</button></div>
+  <div class="response" id="resp_create_company"></div>
+
+  <label>GET /companies/get?id=&lt;uuid&gt;</label>
+  <input id="c_get_id" placeholder="company id (uuid)">
+  <div class="actions"><button onclick="getCompany()">Get</button></div>
+  <div class="response" id="resp_get_company"></div>
+
+  <label>PUT /companies/add_user</label>
+  <input id="add_user_user_id" placeholder="user_id (uuid)">
+  <input id="add_user_company_id" placeholder="company_id (uuid)">
+  <div class="actions"><button onclick="addUserToCompany()">Add User</button></div>
+  <div class="response" id="resp_add_user"></div>
+
+  <label>PUT /companies/delete_user</label>
+  <input id="del_user_user_id" placeholder="user_id (uuid)">
+  <input id="del_user_company_id" placeholder="company_id (uuid)">
+  <div class="actions"><button onclick="deleteUserFromCompany()">Delete User</button></div>
+  <div class="response" id="resp_del_user"></div>
+</section>
+
+<!-- Tasks -->
+<section class="card" id="tasks">
+  <h2>Tasks</h2>
+  <label>POST /tasks/task — TaskCreate</label>
+  <textarea id="task_desc" placeholder="description"></textarea>
+  <input id="task_deadline" placeholder="deadline (YYYY-MM-DDTHH:MM:SS)">
+  <input id="task_company_id" placeholder="company_id (uuid)">
+  <input id="task_perform_user_id" placeholder="perform_user_id (uuid)">
+  <div class="actions"><button onclick="createTask()">Create Task</button></div>
+  <div class="response" id="resp_create_task"></div>
+
+  <label>GET /tasks/task?task_id=&lt;uuid&gt;</label>
+  <input id="get_task_id" placeholder="task_id">
+  <div class="actions"><button onclick="getTask()">Get Task</button></div>
+  <div class="response" id="resp_get_task"></div>
+
+  <label>PUT /tasks/update_status</label>
+  <input id="us_task_id" placeholder="task_id (uuid)">
+  <input id="us_new_status" placeholder="new_status">
+  <div class="actions"><button onclick="updateStatus()">Update Status</button></div>
+  <div class="response" id="resp_update_status"></div>
+
+  <label>POST /tasks/assign_to</label>
+  <input id="assign_user_id" placeholder="user_id (uuid)">
+  <input id="assign_task_id" placeholder="task_id (uuid)">
+  <div class="actions"><button onclick="assignTask()">Assign Task</button></div>
+  <div class="response" id="resp_assign_task"></div>
+
+  <label>POST /tasks/create_comment</label>
+  <input id="com_task_id" placeholder="task_id (uuid)">
+  <textarea id="com_text" placeholder="text"></textarea>
+  <input id="com_to_user_id" placeholder="to_user_id (uuid)">
+  <div class="actions"><button onclick="apiCreateComment()">Create Comment</button></div>
+  <div class="response" id="resp_create_comment"></div>
+
+  <label>GET /tasks/chat_history?task_id=&lt;uuid&gt;&user1=&lt;uuid&gt;&user2=&lt;uuid&gt;</label>
+  <input id="chat_task_id" placeholder="task_id">
+  <input id="chat_user1" placeholder="user1 id">
+  <input id="chat_user2" placeholder="user2 id">
+  <div class="actions"><button onclick="getChatHistory()">Get Chat History</button></div>
+  <div class="response" id="resp_chat_history"></div>
+</section>
+
+<!-- Marks -->
+<section class="card" id="marks">
+  <h2>Marks</h2>
+  <label>GET /marks/get_marks</label>
+  <div class="actions"><button onclick="getMarks()">Get Marks</button></div>
+  <div class="response" id="resp_get_marks"></div>
+
+  <label>GET /marks/get_avg_marks</label>
+  <input id="avg_from" placeholder="from_date (ISO)">
+  <input id="avg_to" placeholder="to_date (ISO)">
+  <div class="actions"><button onclick="getAvgMarks()">Get Avg Marks</button></div>
+  <div class="response" id="resp_get_avg"></div>
+
+  <label>POST /marks/add_rating</label>
+  <input id="mark_task_id" placeholder="task_id (uuid)">
+  <input id="mark_value" type="number" placeholder="mark 1-5">
+  <div class="actions"><button onclick="addRating()">Add Rating</button></div>
+  <div class="response" id="resp_add_rating"></div>
+</section>
+
+<!-- Meetings -->
+<section class="card" id="meetings">
+  <h2>Meetings</h2>
+  <label>GET /meetings</label>
+  <div class="actions"><button onclick="getMeetings()">Get Meetings</button></div>
+  <div class="response" id="resp_get_meetings"></div>
+
+  <label>POST /meetings</label>
+  <input id="meet_user_ids" placeholder="user ids comma separated (uuid)">
+  <input id="meet_desc" placeholder="description">
+  <input id="meet_start" placeholder="starttime (ISO)">
+  <input id="meet_end" placeholder="endtime (ISO)">
+  <div class="actions"><button onclick="createMeeting()">Create Meeting</button></div>
+  <div class="response" id="resp_create_meeting"></div>
+
+  <label>PUT /meetings/cancel?meeting_id=&lt;uuid&gt;</label>
+  <input id="cancel_meeting_id" placeholder="meeting_id">
+  <div class="actions"><button onclick="cancelMeeting()">Cancel Meeting</button></div>
+  <div class="response" id="resp_cancel_meeting"></div>
+</section>
+
+<!-- Calendar -->
+<section class="card" id="calendar">
+  <h2>Calendar</h2>
+  <label>GET /calendar/by_day</label>
+  <input id="cal_year" placeholder="year">
+  <input id="cal_month" placeholder="month">
+  <input id="cal_day" placeholder="day">
+  <div class="actions"><button onclick="getCalendarByDay()">Get by Day</button></div>
+  <div class="response" id="resp_cal_day"></div>
+
+  <label>GET /calendar/by_month</label>
+  <input id="cal_year_m" placeholder="year">
+  <input id="cal_month_m" placeholder="month">
+  <div class="actions"><button onclick="getCalendarByMonth()">Get by Month</button></div>
+  <div class="response" id="resp_cal_month"></div>
+</section>
+
+</main>
+
+<script src="/frontend_logic.js" defer></script>
+</body>
+</html> 
+
+

@@ -25,7 +25,7 @@ class TaskService:
         )
         return TaskGet.model_validate(new_task)
 
-    async def get_task(self, task_id: UUID, user_id: UUID) -> TaskGet:
+    async def get_tasks_for_user(self, task_id: UUID, user_id: UUID) -> TaskGet:
         tasks = await TaskRepository(self.session).get_filtered_by_params(
             id=task_id, perform_user_id=user_id
         )
@@ -36,6 +36,15 @@ class TaskService:
             )
         task_obj = tasks[0]
         return TaskGet.model_validate(task_obj)
+    
+    async def get_task(self, task_id: UUID):
+        task = await TaskRepository(self.session).get_by_id(id=task_id)
+        if not task:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Нет задач для этого пользователя",
+            )
+        return TaskGet.model_validate(task)
 
     async def delete_task(self, task_id: UUID):
         result = await TaskRepository(self.session).delete(id=task_id)
@@ -136,9 +145,7 @@ class TaskService:
             task_id=task_id
         )
         if not all_comments:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Коментарии не найдены"
-            )
+            return None
         all_comments_prepared = [
             CommentGet.model_validate(comment) for comment in all_comments
         ]
@@ -154,9 +161,7 @@ class TaskService:
             task_id=task_id
         )
         if not all_comments:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Коментарии не найдены"
-            )
+            return None
         chat_comments = [
             comment
             for comment in all_comments

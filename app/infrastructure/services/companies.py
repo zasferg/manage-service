@@ -42,7 +42,7 @@ class CompanyService:
         return Company.model_validate(updated_company)
 
     async def delete_user_from_company(self, user_id: UUID, company_id: UUID):
-        user = await UserRepository.get_by_id(id=user_id)
+        user = await UserRepository(self.session).get_by_id(id=user_id)
         if not user:
             raise HTTPException(
                 status_code=HTTP_404_NOT_FOUND, detail="Пользователя не существует"

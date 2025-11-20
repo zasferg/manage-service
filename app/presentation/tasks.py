@@ -26,7 +26,7 @@ async def get_task(
     session: AsyncSession = Depends(get_session),
 ) -> TaskGet:
     try:
-        tasks = await TaskService(session).get_task(
+        tasks = await TaskService(session).get_tasks_for_user(
             task_id=task_id, user_id=current_user["user"].id
         )
         return tasks
@@ -82,6 +82,7 @@ async def update_task(
 @tasks.delete("/task")
 async def delete_task(
     task_id: UUID,
+    user_id: UUID,
     session: AsyncSession = Depends(get_session),
     manager_permission=Depends(user_manager_permission),
 ) -> TaskGet:
@@ -114,8 +115,9 @@ async def update_status(
     current_user=Depends(access_token_auth),
 ) -> TaskGet:
     try:
-        task = TaskService(session).get_task(task_id=task_id)
-        if not current_user.company_id == task.company_id:
+        print(current_user)
+        task = await TaskService(session).get_tasks_for_user(user_id=current_user["user"].id, task_id=task_id)
+        if not current_user["user"].company_id == task.company_id:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Данный пользователь не имеет такого задания",
@@ -145,7 +147,7 @@ async def assign_task_to(
 ):
     try:
         updated_task = await TaskService(session).assing_to(
-            user_id=user_id, task_id=task_id
+            user_id=user_id, task_id=task_id, manager_id=user_permission.id
         )
         return updated_task
     except Exception as _e:

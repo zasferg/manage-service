@@ -39,7 +39,10 @@ class MeetingUpdate(BaseModel):
 class Meeting(MeetingBase, BaseSchema):
     pass
 
-
+class MeetingCreateRequest(BaseModel):
+    user_ids: list[UUID]
+    meeting_data: MeetingCreate
+    
 class MeetingWithRelations(Meeting):
     user_meetings: List["UserMeetingRelationResponse"] = []
 
