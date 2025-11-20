@@ -43,4 +43,3 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
-print(settings.postgres_db_url())

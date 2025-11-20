@@ -115,7 +115,6 @@ async def update_status(
     current_user=Depends(access_token_auth),
 ) -> TaskGet:
     try:
-        print(current_user)
         task = await TaskService(session).get_tasks_for_user(user_id=current_user["user"].id, task_id=task_id)
         if not current_user["user"].company_id == task.company_id:
             raise HTTPException(
